@@ -1,0 +1,25 @@
+version: '3'
+services:
+  docker_mysql:
+    image: 'mysql:latest'
+    container_name: docker_mysql
+    restart: always
+    environment:
+      - MYSQL_DATABASE=db_example
+      - MYSQL_ROOT_PASSWORD=123456
+    ports:
+      - "3307:3306"
+    volumes:
+      - /home/docker/volumes/myapp/mysql/:/var/lib/mysql/
+  spring-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - docker_mysql
+    container_name: spring-app
+    restart: no
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://docker_mysql:3306/db_example?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
